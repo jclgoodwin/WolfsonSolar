@@ -17,10 +17,10 @@ var capacity = 10560; // 10.56 kW
 
 
 var wows = ['Wow', 'Blimey', 'Yikes', 'Yippee', 'Yay', 'Hooray', 'Three cheers', 'What a day'];
-var wow_adjectives = ['a great big', 'a whopping', 'a huge', 'an enormous', 'an impressive', 'a super'];
+var wow_adjectives = ['a great big', 'a whopping', 'a huge', 'an enormous', 'an impressive', 'a super', 'a whole'];
 var mehs = ['Can’t complain, I suppose.', 'Not bad.'];
 var meh_adjectives = ['decent', 'pretty good', 'quite good'];
-var verbs = ['generated', 'generated', 'made', 'made', 'synthesized', 'harvested'];
+var verbs = ['generated', 'generated', 'made', 'made', 'produced', 'produced', 'managed'];
 
 
 function pickRandom(from) {
@@ -147,8 +147,12 @@ function getTweetText(kilowattHours) {
         ]) + ' ' + pickRandom(['⛅', '🌥']);
     }
     return pickRandom([
-        'Today I ' + verb + ' ' + kilowattHours + ' kWh. ',
-        'I '       + verb + ' ' + kilowattHours + ' kWh today. ',
+        'Today I '               + verb + ' '       + kilowattHours + ' kWh. ',
+        'Today I '               + verb + ' only  ' + kilowattHours + ' kWh. ',
+        'Oh dear, today I only ' + verb + ' '       + kilowattHours + ' kWh. ',
+        'I '                     + verb + ' '       + kilowattHours + ' kWh today. ',
+        'I '                     + verb + ' '       + kilowattHours + ' kWh today. ',
+        'I only '                + verb + ' '       + kilowattHours + ' kWh today. ',
     ]) + '☁️' + pickRandom([' Maybe it will be sunnier tomorrow.', ' Must have been cloudy.', ' I tried my best.', '']);
 }
 
