@@ -43,9 +43,7 @@ function getCookies(then) {
     request.get({
         url: 'https://easyview.auroravision.net/easyview/?entityId=' + eid,
         jar: true
-    }, function(a,b,c) {
-        then();
-    });
+    }, then);
 }
 
 function getKilowattHours(then) {
