@@ -14,6 +14,7 @@ var client = new Twitter({
 
 
 var capacity = 10560; // 10.56 kW
+var eid = '9337259'; // entityId from the auroravision URL
 
 
 var wows = ['Wow', 'Blimey', 'Yikes', 'Yippee', 'Yay', 'Hooray', 'Three cheers', 'What a day'];
@@ -38,14 +39,23 @@ function tweet(text) {
     });
 }
 
+function getCookies(then) {
+    request.get({
+        url: 'https://easyview.auroravision.net/easyview/?entityId=' + eid,
+        jar: true
+    }, function(a,b,c) {
+        then();
+    });
+}
 
 function getKilowattHours(then) {
-    var baseURL = 'https://easyview.auroravision.net/easyview/services/gmi/summary/GenerationEnergy.json',
-        eid = '9337259',
+    var url = 'https://easyview.auroravision.net/easyview/services/gmi/summary/GenerationEnergy.json',
         today = moment();
+    url += '?type=GenerationEnergy&eids=' + eid + '&start=' + today.format('YYYYMMDD') + '&end=' + today.add(1, 'd').format('YYYYMMDD');
     request.get({
-        url: baseURL + '?type=GenerationEnergy&eids=' + eid + '&start=' + today.format('YYYYMMDD') + '&end=' + today.add(1, 'd').format('YYYYMMDD'),
-        json: true
+        url: url,
+        json: true,
+        jar: true  // cookies
     }, function (error, response, body) {
         then(body.fields[1].values[0].value);
     });
@@ -79,12 +89,13 @@ function getSparklineFromNumbers(numbers) {
 }
 
 function getSparkline(then) {
-    var baseURL = 'https://easyview.auroravision.net/easyview/services/gmi/summary.json',
-        eid = '9337259',
+    var url = 'https://easyview.auroravision.net/easyview/services/gmi/summary.json',
         today = moment();
+    url += '?fields=GenerationPower&eids=' + eid + '&start=' + today.format('YYYYMMDD') + '&end=' + today.add(1, 'd').format('YYYYMMDD');
     request.get({
-        url: baseURL + '?fields=GenerationPower&eids=' + eid + '&start=' + today.format('YYYYMMDD') + '&end=' + today.add(1, 'd').format('YYYYMMDD'),
-        json: true
+        url: url,
+        json: true,
+        jar: true
     }, function (error, response, body) {
         var hours = {
             0: 0,
@@ -157,12 +168,14 @@ function getTweetText(kilowattHours) {
 }
 
 exports.handler = function () {
-    getKilowattHours(function (kilowattHours) {
-        var text = getTweetText(kilowattHours);
-        getSparkline(function(sparkline) {
-            text += '\n' + sparkline;
-            // console.log(text);
-            tweet(text);
+    getCookies(function() {
+        getKilowattHours(function (kilowattHours) {
+            var text = getTweetText(kilowattHours);
+            getSparkline(function(sparkline) {
+                text += '\n' + sparkline;
+                // console.log(text);
+                tweet(text);
+            });
         });
     });
 };
